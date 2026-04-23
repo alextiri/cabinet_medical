@@ -8,7 +8,6 @@ import org.example.model.Sex;
 import java.util.List;
 
 public interface ICabinetMedical {
-    Pacient getPacientFromFields();
     String getNume();
     String getPrenume();
     Sex getSex();
@@ -19,7 +18,11 @@ public interface ICabinetMedical {
     String getTelefon();
     String getAdresa();
 
-    Consultatie getConsultatieFromFields();
+    String getDataConsultatiei();
+    String getSimptome();
+    String getDiagnostic();
+    String getTratament();
+    String getObservatii();
 
     String getSearchText();
     String getDiagnosticFilterText();

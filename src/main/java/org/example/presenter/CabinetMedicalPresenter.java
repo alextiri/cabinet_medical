@@ -6,6 +6,7 @@ import org.example.model.Pacient;
 import org.example.model.repository.FisaMedicalaRepository;
 import org.example.model.repository.PacientRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class CabinetMedicalPresenter {
@@ -25,15 +26,36 @@ public class CabinetMedicalPresenter {
     }
 
     public void addPacient() {
-        Pacient pacient = view.getPacientFromFields();
+        Pacient pacient = new Pacient();
+
+        pacient.setNume(view.getNume());
+        pacient.setPrenume(view.getPrenume());
+        pacient.setSex(view.getSex());
+
+        String inaltime = view.getInaltime();
+        if (!inaltime.isEmpty()) {
+            pacient.setInaltime(Double.parseDouble(inaltime));
+        }
+
+        String greutate = view.getGreutate();
+        if (!greutate.isEmpty()) {
+            pacient.setGreutate(Double.parseDouble(greutate));
+        }
+
+        String data = view.getDataNasterii();
+        if (!data.isEmpty()) {
+            pacient.setDataNasterii(LocalDate.parse(data));
+        }
+
+        pacient.setCnp(view.getCnp());
+        pacient.setTelefon(view.getTelefon());
+        pacient.setAdresa(view.getAdresa());
 
         int pacientId = pacientRepository.addPacient(pacient);
-
         if (pacientId == -1) {
             view.showMessage("Pacientul nu a putut fi adaugat.");
             return;
         }
-
         pacient.setId(pacientId);
 
         FisaMedicala fisaMedicala = new FisaMedicala();
@@ -58,7 +80,31 @@ public class CabinetMedicalPresenter {
             return;
         }
 
-        Pacient pacient = view.getPacientFromFields();
+        Pacient pacient = new Pacient();
+
+        pacient.setNume(view.getNume());
+        pacient.setPrenume(view.getPrenume());
+        pacient.setSex(view.getSex());
+
+        String inaltime = view.getInaltime();
+        if (!inaltime.isEmpty()) {
+            pacient.setInaltime(Double.parseDouble(inaltime));
+        }
+
+        String greutate = view.getGreutate();
+        if (!greutate.isEmpty()) {
+            pacient.setGreutate(Double.parseDouble(greutate));
+        }
+
+        String data = view.getDataNasterii();
+        if (!data.isEmpty()) {
+            pacient.setDataNasterii(LocalDate.parse(data));
+        }
+
+        pacient.setCnp(view.getCnp());
+        pacient.setTelefon(view.getTelefon());
+        pacient.setAdresa(view.getAdresa());
+
         pacient.setId(id);
 
         pacientRepository.updatePacient(pacient);
@@ -109,8 +155,18 @@ public class CabinetMedicalPresenter {
             return;
         }
 
-        Consultatie consultatie = view.getConsultatieFromFields();
-        fisaMedicalaRepository.addConsultatie(consultatie, fisaMedicala.getId());
+        Consultatie c = new Consultatie();
+
+        String data = view.getDataConsultatiei();
+        if (!data.isEmpty()) {
+            c.setDataConsultatiei(LocalDate.parse(data));
+        }
+
+        c.setSimptome(view.getSimptome());
+        c.setDiagnostic(view.getDiagnostic());
+        c.setTratament(view.getTratament());
+        c.setObservatii(view.getObservatii());
+        fisaMedicalaRepository.addConsultatie(c, fisaMedicala.getId());
 
         FisaMedicala updatedFisa = fisaMedicalaRepository.findFisaMedicalaByPacientId(pacientId);
         if (updatedFisa != null) {

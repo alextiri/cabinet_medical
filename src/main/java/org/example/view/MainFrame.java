@@ -509,38 +509,6 @@ public class MainFrame extends JFrame implements ICabinetMedical {
         dialog.setVisible(true);
     }
 
-
-
-    @Override
-    public Pacient getPacientFromFields() {
-        Pacient pacient = new Pacient();
-
-        pacient.setNume(txtNume.getText().trim());
-        pacient.setPrenume(txtPrenume.getText().trim());
-        pacient.setSex((Sex) cmbSex.getSelectedItem());
-
-        String inaltimeText = txtInaltime.getText().trim();
-        if (!inaltimeText.isEmpty()) {
-            pacient.setInaltime(Double.parseDouble(inaltimeText));
-        }
-
-        String greutateText = txtGreutate.getText().trim();
-        if (!greutateText.isEmpty()) {
-            pacient.setGreutate(Double.parseDouble(greutateText));
-        }
-
-        pacient.setCnp(txtCnp.getText().trim());
-        String dataText = txtDataNasterii.getText().trim();
-        if (!dataText.isEmpty()) {
-            pacient.setDataNasterii(LocalDate.parse(dataText));
-        }
-
-        pacient.setTelefon(txtTelefon.getText().trim());
-        pacient.setAdresa(txtAdresa.getText().trim());
-
-        return pacient;
-    }
-
     @Override
     public String getNume() {
         return txtNume.getText().trim();
@@ -631,20 +599,28 @@ public class MainFrame extends JFrame implements ICabinetMedical {
     }
 
     @Override
-    public Consultatie getConsultatieFromFields() {
-        Consultatie consultatie = new Consultatie();
+    public String getDataConsultatiei() {
+        return txtDataConsultatiei.getText().trim();
+    }
 
-        String dataText = txtDataConsultatiei.getText().trim();
-        if (!dataText.isEmpty()) {
-            consultatie.setDataConsultatiei(LocalDate.parse(dataText));
-        }
+    @Override
+    public String getSimptome() {
+        return txtSimptome.getText().trim();
+    }
 
-        consultatie.setSimptome(txtSimptome.getText().trim());
-        consultatie.setDiagnostic(txtDiagnostic.getText().trim());
-        consultatie.setTratament(txtTratament.getText().trim());
-        consultatie.setObservatii(txtObservatii.getText().trim());
+    @Override
+    public String getDiagnostic() {
+        return txtDiagnostic.getText().trim();
+    }
 
-        return consultatie;
+    @Override
+    public String getTratament() {
+        return txtTratament.getText().trim();
+    }
+
+    @Override
+    public String getObservatii() {
+        return txtObservatii.getText().trim();
     }
 
     @Override
