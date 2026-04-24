@@ -1,21 +1,25 @@
 package org.example.view;
 
+import org.example.model.CabinetMedicalModel;
+import org.example.observer.Observer;
 import org.example.model.Consultatie;
 import org.example.model.Pacient;
 import org.example.model.Sex;
-import org.example.presenter.CabinetMedicalPresenter;
-import org.example.presenter.ICabinetMedical;
+import org.example.model.dto.ConsultatieFormData;
+import org.example.model.dto.PacientFormData;
+import org.example.presenter.ICabinetMedicalController;
+import org.example.presenter.ICabinetMedicalView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFrame extends JFrame implements ICabinetMedical {
-    private final CabinetMedicalPresenter presenter;
+public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
+    private ICabinetMedicalController controller;
+    private final CabinetMedicalModel model;
 
     private JTextField txtNume;
     private JTextField txtPrenume;
@@ -65,25 +69,41 @@ public class MainFrame extends JFrame implements ICabinetMedical {
     private JSplitPane rightSplit;
     private JSplitPane mainSplit;
 
-    public MainFrame() {
-        presenter = new CabinetMedicalPresenter(this);
+    public MainFrame(CabinetMedicalModel model) {
+        this.model = model;
+        model.addObserver(this);
 
         initializeComponents();
+        btnAdd.setEnabled(false);
+        btnUpdate.setEnabled(false);
+        btnDelete.setEnabled(false);
+        btnSearch.setEnabled(false);
+        btnAddConsultatie.setEnabled(false);
+        btnDeleteConsultatie.setEnabled(false);
+        btnFilter.setEnabled(false);
+        btnShowAllPacienti.setEnabled(false);
         layoutComponents();
         registerListeners();
 
-        presenter.loadAllPacienti();
         setTitle("Cabinet Medical");
         setSize(1500, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+    }
 
-        SwingUtilities.invokeLater(() -> {
-            mainSplit.setDividerLocation(350);
-            rightSplit.setDividerLocation(250);
-            consultatiiSplit.setDividerLocation(320);
-        });
+    public void setController(ICabinetMedicalController controller) {
+        this.controller = controller;
+        btnAdd.setEnabled(true);
+        btnUpdate.setEnabled(true);
+        btnDelete.setEnabled(true);
+        btnSearch.setEnabled(true);
+        btnAddConsultatie.setEnabled(true);
+        btnDeleteConsultatie.setEnabled(true);
+        btnFilter.setEnabled(true);
+        btnShowAllPacienti.setEnabled(true);
+
+        controller.loadAllPacienti();
     }
 
     private void initializeComponents() {
@@ -337,9 +357,9 @@ public class MainFrame extends JFrame implements ICabinetMedical {
     }
 
     private void registerListeners() {
-        btnAdd.addActionListener(e -> presenter.addPacient());
-        btnUpdate.addActionListener(e -> presenter.updatePacient());
-        btnDelete.addActionListener(e -> presenter.deletePacient());
+        btnAdd.addActionListener(e -> controller.addPacient());
+        btnUpdate.addActionListener(e -> controller.updatePacient());
+        btnDelete.addActionListener(e -> controller.deletePacient());
         btnClear.addActionListener(e -> {
             clearFields();
             clearPacientDetails();
@@ -347,18 +367,18 @@ public class MainFrame extends JFrame implements ICabinetMedical {
             showConsultatii(new ArrayList<>());
             tablePacienti.clearSelection();
         });
-        btnSearch.addActionListener(e -> presenter.searchPacientiByName());
+        btnSearch.addActionListener(e -> controller.searchPacientiByName());
 
-        btnFilter.addActionListener(e -> presenter.filterPacienti());
+        btnFilter.addActionListener(e -> controller.filterPacienti());
         btnShowAllPacienti.addActionListener(e -> {
             txtSearch.setText("");
             txtDiagnosticFilter.setText("");
             txtTratamentFilter.setText("");
-            presenter.loadAllPacienti();
+            controller.loadAllPacienti();
         });
 
-        btnAddConsultatie.addActionListener(e -> presenter.addConsultatie());
-        btnDeleteConsultatie.addActionListener(e -> presenter.deleteConsultatie());
+        btnAddConsultatie.addActionListener(e -> controller.addConsultatie());
+        btnDeleteConsultatie.addActionListener(e -> controller.deleteConsultatie());
 
         tableConsultatii.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -376,7 +396,7 @@ public class MainFrame extends JFrame implements ICabinetMedical {
         });
     }
 
-    private void clearPacientDetails() {
+    public void clearPacientDetails() {
         lblDetNumeValue.setText("-");
         lblDetPrenumeValue.setText("-");
         lblDetSexValue.setText("-");
@@ -388,25 +408,29 @@ public class MainFrame extends JFrame implements ICabinetMedical {
         lblDetAdresaValue.setText("-");
     }
 
-    private void showPacientDetails(Pacient pacient) {
+    private String value(String s) {
+        return (s == null || s.isBlank()) ? "-" : s;
+    }
+
+    @Override
+    public void showPacientDetails(Pacient pacient) {
         if (pacient == null) {
             clearPacientDetails();
             return;
         }
 
-        lblDetNumeValue.setText(pacient.getNume() != null ? pacient.getNume() : "-");
-        lblDetPrenumeValue.setText(pacient.getPrenume() != null ? pacient.getPrenume() : "-");
+        lblDetNumeValue.setText(value(pacient.getNume()));
+        lblDetPrenumeValue.setText(value(pacient.getPrenume()));
         lblDetSexValue.setText(pacient.getSex() != null ? pacient.getSex().toString() : "-");
 
-        lblDetInaltimeValue.setText(pacient.getInaltime() == 0 ? "-" : String.valueOf(pacient.getInaltime()));
-        lblDetGreutateValue.setText(pacient.getGreutate() == 0 ? "-" : String.valueOf(pacient.getGreutate()));
-
-        lblDetCnpValue.setText(pacient.getCnp() != null ? pacient.getCnp() : "-");
+        lblDetInaltimeValue.setText(String.valueOf(pacient.getInaltime()));
+        lblDetGreutateValue.setText(String.valueOf(pacient.getGreutate()));
+        lblDetCnpValue.setText(value(pacient.getCnp()));
         lblDetDataNasteriiValue.setText(
                 pacient.getDataNasterii() != null ? pacient.getDataNasterii().toString() : "-"
         );
-        lblDetTelefonValue.setText(pacient.getTelefon() != null ? pacient.getTelefon() : "-");
-        lblDetAdresaValue.setText(pacient.getAdresa() != null ? pacient.getAdresa() : "-");
+        lblDetTelefonValue.setText(value(pacient.getTelefon()));
+        lblDetAdresaValue.setText(value(pacient.getAdresa()));
     }
 
     private void populateFieldsFromSelectedRow() {
@@ -417,29 +441,8 @@ public class MainFrame extends JFrame implements ICabinetMedical {
         }
 
         int id = (int) tableModel.getValueAt(selectedRow, 0);
-        Pacient pacient = presenter.getPacientById(id);
 
-        if (pacient == null) {
-            clearPacientDetails();
-            return;
-        }
-
-        txtNume.setText(pacient.getNume() != null ? pacient.getNume() : "");
-        txtPrenume.setText(pacient.getPrenume() != null ? pacient.getPrenume() : "");
-        cmbSex.setSelectedItem(pacient.getSex());
-
-        txtInaltime.setText(String.valueOf(pacient.getInaltime()));
-        txtGreutate.setText(String.valueOf(pacient.getGreutate()));
-        txtCnp.setText(pacient.getCnp() != null ? pacient.getCnp() : "");
-        txtDataNasterii.setText(
-                pacient.getDataNasterii() != null ? pacient.getDataNasterii().toString() : ""
-        );
-        txtTelefon.setText(pacient.getTelefon() != null ? pacient.getTelefon() : "");
-        txtAdresa.setText(pacient.getAdresa() != null ? pacient.getAdresa() : "");
-
-        showPacientDetails(pacient);
-
-        presenter.loadFisaMedicalaForSelectedPacient();
+        controller.onPacientSelected(id);
     }
 
     private JPanel createDetailArea(String labelText, String value) {
@@ -510,48 +513,42 @@ public class MainFrame extends JFrame implements ICabinetMedical {
     }
 
     @Override
-    public String getNume() {
-        return txtNume.getText().trim();
+    public PacientFormData getPacientFormData() {
+        return new PacientFormData(
+                txtNume.getText().trim(),
+                txtPrenume.getText().trim(),
+                (Sex) cmbSex.getSelectedItem(),
+                txtInaltime.getText().trim(),
+                txtGreutate.getText().trim(),
+                txtCnp.getText().trim(),
+                txtDataNasterii.getText().trim(),
+                txtTelefon.getText().trim(),
+                txtAdresa.getText().trim()
+        );
     }
 
     @Override
-    public String getPrenume() {
-        return txtPrenume.getText().trim();
+    public void populatePacientForm(PacientFormData data) {
+        txtNume.setText(data.nume);
+        txtPrenume.setText(data.prenume);
+        cmbSex.setSelectedItem(data.sex);
+        txtInaltime.setText(data.inaltime);
+        txtGreutate.setText(data.greutate);
+        txtCnp.setText(data.cnp);
+        txtDataNasterii.setText(data.dataNasterii);
+        txtTelefon.setText(data.telefon);
+        txtAdresa.setText(data.adresa);
     }
 
     @Override
-    public Sex getSex() {
-        return (Sex) cmbSex.getSelectedItem();
-    }
-
-    @Override
-    public String getInaltime() {
-        return txtInaltime.getText().trim();
-    }
-
-    @Override
-    public String getGreutate() {
-        return txtGreutate.getText().trim();
-    }
-
-    @Override
-    public String getCnp() {
-        return txtCnp.getText().trim();
-    }
-
-    @Override
-    public String getDataNasterii() {
-        return txtDataNasterii.getText().trim();
-    }
-
-    @Override
-    public String getTelefon() {
-        return txtTelefon.getText().trim();
-    }
-
-    @Override
-    public String getAdresa() {
-        return txtAdresa.getText().trim();
+    public ConsultatieFormData getConsultatieFormData() {
+        return new ConsultatieFormData(
+                txtDataConsultatiei.getText().trim(),
+                txtSimptome.getText().trim(),
+                txtDiagnostic.getText().trim(),
+                txtTratament.getText().trim(),
+                txtObservatii.getText().trim()
+        );
     }
 
     @Override
@@ -572,10 +569,10 @@ public class MainFrame extends JFrame implements ICabinetMedical {
     public void showPacienti(List<Pacient> pacienti) {
         tableModel.setRowCount(0);
 
-        for (Pacient pacient : pacienti) {
+        for (Pacient p : pacienti) {
             tableModel.addRow(new Object[]{
-                    pacient.getId(),
-                    pacient.getNume() + " " + pacient.getPrenume()
+                    p.getId(),
+                    p.getNume() + " " + p.getPrenume()
             });
         }
     }
@@ -596,31 +593,6 @@ public class MainFrame extends JFrame implements ICabinetMedical {
         txtDataNasterii.setText("");
         txtTelefon.setText("");
         txtAdresa.setText("");
-    }
-
-    @Override
-    public String getDataConsultatiei() {
-        return txtDataConsultatiei.getText().trim();
-    }
-
-    @Override
-    public String getSimptome() {
-        return txtSimptome.getText().trim();
-    }
-
-    @Override
-    public String getDiagnostic() {
-        return txtDiagnostic.getText().trim();
-    }
-
-    @Override
-    public String getTratament() {
-        return txtTratament.getText().trim();
-    }
-
-    @Override
-    public String getObservatii() {
-        return txtObservatii.getText().trim();
     }
 
     @Override
@@ -665,5 +637,10 @@ public class MainFrame extends JFrame implements ICabinetMedical {
     @Override
     public String getTratamentFilterText() {
         return txtTratamentFilter.getText().trim();
+    }
+
+    @Override
+    public void update() {
+        showPacienti(model.getPacienti());
     }
 }

@@ -1,5 +1,7 @@
 package org.example.model;
 
+import org.example.model.dto.ConsultatieFormData;
+
 import java.time.LocalDate;
 
 public class Consultatie {
@@ -99,5 +101,19 @@ public class Consultatie {
     @Override
     public int hashCode() {
         return Integer.hashCode(id);
+    }
+
+    public static Consultatie fromFormData(ConsultatieFormData data) {
+        Consultatie c = new Consultatie();
+
+        if (!data.dataConsultatiei.isBlank())
+            c.setDataConsultatiei(LocalDate.parse(data.dataConsultatiei));
+
+        c.setSimptome(data.simptome);
+        c.setDiagnostic(data.diagnostic);
+        c.setTratament(data.tratament);
+        c.setObservatii(data.observatii);
+
+        return c;
     }
 }

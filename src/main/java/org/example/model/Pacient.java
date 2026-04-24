@@ -1,5 +1,7 @@
 package org.example.model;
 
+import org.example.model.dto.PacientFormData;
+
 import java.time.LocalDate;
 
 public class Pacient {
@@ -130,5 +132,44 @@ public class Pacient {
     @Override
     public int hashCode() {
         return Integer.hashCode(id);
+    }
+
+    public static Pacient fromFormData(PacientFormData data, Integer id) {
+        Pacient p = new Pacient();
+
+        if (id != null) p.setId(id);
+
+        p.setNume(data.nume);
+        p.setPrenume(data.prenume);
+        p.setSex(data.sex);
+
+        if (!data.inaltime.isBlank())
+            p.setInaltime(Double.parseDouble(data.inaltime));
+
+        if (!data.greutate.isBlank())
+            p.setGreutate(Double.parseDouble(data.greutate));
+
+        if (!data.dataNasterii.isBlank())
+            p.setDataNasterii(LocalDate.parse(data.dataNasterii));
+
+        p.setCnp(data.cnp);
+        p.setTelefon(data.telefon);
+        p.setAdresa(data.adresa);
+
+        return p;
+    }
+
+    public PacientFormData toFormData() {
+        return new PacientFormData(
+                nume,
+                prenume,
+                sex,
+                String.valueOf(inaltime),
+                String.valueOf(greutate),
+                cnp,
+                dataNasterii != null ? dataNasterii.toString() : "",
+                telefon,
+                adresa
+        );
     }
 }
