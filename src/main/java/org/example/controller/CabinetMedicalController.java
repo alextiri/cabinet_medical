@@ -1,5 +1,7 @@
-package org.example.presenter;
+package org.example.controller;
 
+import org.example.export.Exporter;
+import org.example.export.ExporterFactory;
 import org.example.model.CabinetMedicalModel;
 import org.example.model.Consultatie;
 import org.example.model.Pacient;
@@ -133,5 +135,15 @@ public class CabinetMedicalController implements ICabinetMedicalController {
         view.showPacientDetails(pacient);
 
         refreshConsultatii(id);
+    }
+
+    public void refreshView() {
+        view.showPacienti(model.getPacienti());
+    }
+
+    public void exportPacienti(String format, String path) {
+        Exporter exporter = ExporterFactory.getExporter(format);
+        exporter.export(model.getPacienti(), path);
+        view.showMessage("Export realizat: " + format);
     }
 }

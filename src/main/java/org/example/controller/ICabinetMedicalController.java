@@ -1,4 +1,4 @@
-package org.example.presenter;
+package org.example.controller;
 
 public interface ICabinetMedicalController {
 
@@ -14,4 +14,7 @@ public interface ICabinetMedicalController {
     void filterPacienti();
 
     void onPacientSelected(int pacientId);
+
+    void refreshView();
+    void exportPacienti(String format, String path);
 }

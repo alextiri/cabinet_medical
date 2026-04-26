@@ -4,6 +4,7 @@ import org.example.observer.Observer;
 import org.example.observer.Subject;
 import org.example.model.repository.PacientRepository;
 import org.example.model.repository.FisaMedicalaRepository;
+import java.util.Comparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,10 +54,12 @@ public class CabinetMedicalModel implements Subject {
 
     public void updatePacient(Pacient pacient) {
         pacientRepository.updatePacient(pacient);
+        notifyObservers();
     }
 
     public void deletePacient(int id) {
         pacientRepository.deletePacient(id);
+        notifyObservers();
     }
 
     public Pacient getPacientById(int id) {
@@ -65,6 +68,7 @@ public class CabinetMedicalModel implements Subject {
 
     public void loadAllPacienti() {
         List<Pacient> pacienti = pacientRepository.getAllPacienti();
+        pacienti.sort(Comparator.comparingInt(Pacient::getId));
         setPacienti(pacienti);
     }
 
@@ -86,6 +90,8 @@ public class CabinetMedicalModel implements Subject {
         if (fisa == null) return;
 
         fisaMedicalaRepository.deleteConsultatie(consultatieId);
+
+        notifyObservers();
     }
 
     public List<Consultatie> getConsultatiiForPacient(int pacientId) {

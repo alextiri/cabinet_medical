@@ -1,14 +1,13 @@
 package org.example.view;
 
-import org.example.model.CabinetMedicalModel;
 import org.example.observer.Observer;
 import org.example.model.Consultatie;
 import org.example.model.Pacient;
 import org.example.model.Sex;
 import org.example.model.dto.ConsultatieFormData;
 import org.example.model.dto.PacientFormData;
-import org.example.presenter.ICabinetMedicalController;
-import org.example.presenter.ICabinetMedicalView;
+import org.example.controller.ICabinetMedicalController;
+import org.example.controller.ICabinetMedicalView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,7 +18,6 @@ import java.util.List;
 
 public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
     private ICabinetMedicalController controller;
-    private final CabinetMedicalModel model;
 
     private JTextField txtNume;
     private JTextField txtPrenume;
@@ -49,6 +47,9 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
     private JButton btnFilter;
     private JButton btnShowAllPacienti;
 
+    private JComboBox<String> cmbExportFormat;
+    private JButton btnExport;
+
     private JLabel lblDetNumeValue;
     private JLabel lblDetPrenumeValue;
     private JLabel lblDetSexValue;
@@ -69,10 +70,7 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
     private JSplitPane rightSplit;
     private JSplitPane mainSplit;
 
-    public MainFrame(CabinetMedicalModel model) {
-        this.model = model;
-        model.addObserver(this);
-
+    public MainFrame() {
         initializeComponents();
         btnAdd.setEnabled(false);
         btnUpdate.setEnabled(false);
@@ -187,6 +185,8 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
         idCol.setMaxWidth(50);
 
         tablePacienti.getColumnModel().getColumn(1).setPreferredWidth(250);
+        cmbExportFormat = new JComboBox<>(new String[]{"csv", "json", "xml", "txt"});
+        btnExport = new JButton("Export pacienti");
     }
 
     private JPanel createFormRow(String labelText, JComponent field) {
@@ -243,6 +243,14 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
         JPanel filterPanel = new JPanel();
         filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.Y_AXIS));
         filterPanel.setBorder(BorderFactory.createTitledBorder("Filtrare pacienti"));
+
+        JPanel exportPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        exportPanel.add(new JLabel("Export format:"));
+        exportPanel.add(cmbExportFormat);
+        exportPanel.add(btnExport);
+
+        filterPanel.add(exportPanel);
 
         JPanel diagnosticPanel = new JPanel(new BorderLayout(8, 5));
         diagnosticPanel.add(new JLabel("Diagnostic:"), BorderLayout.WEST);
@@ -392,6 +400,18 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
         tablePacienti.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 populateFieldsFromSelectedRow();
+            }
+        });
+
+        btnExport.addActionListener(e -> {
+            String format = (String) cmbExportFormat.getSelectedItem();
+
+            JFileChooser fileChooser = new JFileChooser();
+            int result = fileChooser.showSaveDialog(this);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+                controller.exportPacienti(format, path);
             }
         });
     }
@@ -641,6 +661,6 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
 
     @Override
     public void update() {
-        showPacienti(model.getPacienti());
+        controller.refreshView();
     }
 }

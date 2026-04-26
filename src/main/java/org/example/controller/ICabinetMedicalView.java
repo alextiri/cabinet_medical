@@ -1,4 +1,4 @@
-package org.example.presenter;
+package org.example.controller;
 
 import org.example.model.Consultatie;
 import org.example.model.Pacient;
