@@ -142,8 +142,11 @@ public class CabinetMedicalController implements ICabinetMedicalController {
     }
 
     public void exportPacienti(String format, String path) {
+        if (!path.toLowerCase().endsWith("." + format)) {
+            path = path + "." + format;
+        }
         Exporter exporter = ExporterFactory.getExporter(format);
         exporter.export(model.getPacienti(), path);
-        view.showMessage("Export realizat: " + format);
+        view.showMessage("Export realizat cu succes: " + format);
     }
 }
