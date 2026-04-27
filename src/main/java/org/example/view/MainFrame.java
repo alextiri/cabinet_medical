@@ -432,27 +432,6 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
         return (s == null || s.isBlank()) ? "-" : s;
     }
 
-    @Override
-    public void showPacientDetails(Pacient pacient) {
-        if (pacient == null) {
-            clearPacientDetails();
-            return;
-        }
-
-        lblDetNumeValue.setText(value(pacient.getNume()));
-        lblDetPrenumeValue.setText(value(pacient.getPrenume()));
-        lblDetSexValue.setText(pacient.getSex() != null ? pacient.getSex().toString() : "-");
-
-        lblDetInaltimeValue.setText(String.valueOf(pacient.getInaltime()));
-        lblDetGreutateValue.setText(String.valueOf(pacient.getGreutate()));
-        lblDetCnpValue.setText(value(pacient.getCnp()));
-        lblDetDataNasteriiValue.setText(
-                pacient.getDataNasterii() != null ? pacient.getDataNasterii().toString() : "-"
-        );
-        lblDetTelefonValue.setText(value(pacient.getTelefon()));
-        lblDetAdresaValue.setText(value(pacient.getAdresa()));
-    }
-
     private void populateFieldsFromSelectedRow() {
         int selectedRow = tablePacienti.getSelectedRow();
         if (selectedRow == -1) {
@@ -530,6 +509,27 @@ public class MainFrame extends JFrame implements ICabinetMedicalView, Observer {
         dialog.setSize(500, 500);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+
+    @Override
+    public void showPacientDetails(Pacient pacient) {
+        if (pacient == null) {
+            clearPacientDetails();
+            return;
+        }
+
+        lblDetNumeValue.setText(value(pacient.getNume()));
+        lblDetPrenumeValue.setText(value(pacient.getPrenume()));
+        lblDetSexValue.setText(pacient.getSex() != null ? pacient.getSex().toString() : "-");
+
+        lblDetInaltimeValue.setText(String.valueOf(pacient.getInaltime()));
+        lblDetGreutateValue.setText(String.valueOf(pacient.getGreutate()));
+        lblDetCnpValue.setText(value(pacient.getCnp()));
+        lblDetDataNasteriiValue.setText(
+                pacient.getDataNasterii() != null ? pacient.getDataNasterii().toString() : "-"
+        );
+        lblDetTelefonValue.setText(value(pacient.getTelefon()));
+        lblDetAdresaValue.setText(value(pacient.getAdresa()));
     }
 
     @Override
